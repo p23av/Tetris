@@ -1,0 +1,174 @@
+* {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.game-box {
+  position: relative;
+}
+
+.game-box__accessory {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.accessory {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: start;
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: start;
+  width: 200px;
+}
+
+.accessory .table-preview {
+  border: 1px solid #aaaaaa;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  width: 200px;
+  height: 200px;
+}
+
+.accessory .table-preview .item {
+  width: 25%;
+  height: 50px;
+}
+
+.accessory .stat {
+  margin-top: 10px;
+  width: 100%;
+}
+
+.accessory .stat input {
+  margin-top: 10px;
+  width: 100%;
+  padding: 5px 20px;
+  font-size: 14px;
+}
+
+.green {
+  background-color: #33ff00;
+  border: 5px solid;
+  border-top-color: snow;
+  border-left-color: #aaff00;
+  border-right-color: #00aa00;
+  border-bottom-color: #006600;
+}
+
+.set {
+  background-color: magenta;
+  border: 5px solid;
+  border-top-color: snow;
+  border-left-color: #ffaaff;
+  border-right-color: #aa00aa;
+  border-bottom-color: #660066;
+}
+
+.figure {
+  background-color: #ff6666;
+  border: 5px solid;
+  border-top-color: snow;
+  border-left-color: #ffaaaa;
+  border-right-color: #aa0000;
+  border-bottom-color: #660000;
+}
+
+.tetris * {
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.tetris-game .title {
+  text-align: center;
+  padding-right: 200px;
+}
+
+.new-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  z-index: 1000;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.new-modal-box {
+  padding: 100px;
+  background-color: deepskyblue;
+}
+
+.new-modal-box button {
+  border: none;
+  background-color: snow;
+  padding: 24px;
+  text-transform: uppercase;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.new-modal-box button:focus {
+  border: none;
+  outline: 0;
+}
+
+.tetris-box {
+  visibility: hidden;
+}
+
+.tetris-box.active {
+  visibility: visible;
+}
+
+.main {
+  margin: 0 auto;
+  position: relative;
+  width: 500px;
+  height: 700px;
+  border: 1px solid black;
+  overflow: hidden;
+}
+
+.tetris {
+  width: 500px;
+  height: 900px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  position: absolute;
+  bottom: 0;
+  background-color: #fff;
+}
+
+.excel {
+  width: 50px;
+  height: 50px;
+}
+/*# sourceMappingURL=style.css.map */

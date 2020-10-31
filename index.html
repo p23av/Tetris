@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetris game</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body class="tetris-game">
+    <div class="black-box"></div>
+    <header></header>
+    <section>
+      <div class="new-modal">
+        <div class="new-modal-box">
+          <button id="start-game" class="button">начать игру</button>
+        </div>
+      </div>
+      <div class="container tetris-box">
+        <p class="title">Tetris game</p>
+        <div class="game-box d-flex">
+          <div class="main"></div>
+          <div class="game-box__accessory accessory">
+            <div class="table-preview">
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item start"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+            </div>
+            <div class="stat d-flex flex-column justify-content-center align-items-center">
+              <input class="level" type="text" readonly>
+              <input class="score" type="text" readonly>
+              <input class="speed" type="text" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <footer></footer>
+    <script src="main.js"></script>
+  </body>
+</html>
