@@ -10,18 +10,20 @@
   </head>
   <body class="tetris-game">
     <div class="black-box"></div>
-    <header></header>
+    <header>
+      <audio src="/music/8-Bit Universe — Tetris Theme.mp3" controls></audio>
+    </header>
     <section>
       <div class="new-modal">
         <div class="new-modal-box">
-          <button id="start-game" class="button">начать игру</button>
+          <button id="start-game" type="button" class="button">начать игру</button>
         </div>
       </div>
       <div class="container tetris-box">
-        <p class="title">Tetris game</p>
-        <div class="game-box d-flex">
-          <div class="main"></div>
-          <div class="game-box__accessory accessory">
+        <h1 class="tetris-box__title">Tetris game</h1>
+        <div class="tetris-box__window window game-box d-flex">
+          <div class="window__main"></div>
+          <div class="window__accessory accessory">
             <div class="table-preview">
               <div class="item"></div>
               <div class="item"></div>
