@@ -126,6 +126,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     startGame();
 
+    let excel = document.getElementsByClassName('window__cell');
+    let previewItem = document.getElementsByClassName('item');
+    function setCellAttribute (elemsArr, lengthY, lengthX, nameAttribute, index, y) {
+      if (!index) {
+        index = 0
+      }
+      y ? y-- : y = lengthY;
+      for (let x = 1; x <= lengthX; x++) {
+        try {
+          // elemsArr[index].setAttribute(nameAttribute + 'X', x);
+          // elemsArr[index].setAttribute(nameAttribute + 'Y', y);
+          elemsArr[index].dataset.pos = String(y).padStart(2, '0') + String(x).padStart(2, '0');
+          index++;
+        } catch (error) {
+          debugger
+        }
+      }
+      if (y > 1) {
+        setCellAttribute (elemsArr, lengthY, lengthX, nameAttribute, index, y);
+      }
+    }
+
+    setCellAttribute(excel, 18, 10, 'pos');
+    setCellAttribute(previewItem, 4, 4, 'pr');
+
     figureNew.createFigure();
   });
 });
@@ -279,8 +304,57 @@ class Figure {
     }
   }
 
-  checkLineComplete(cls) {
-    let cells = [...document.getElementsByClassName('window__cell')].reverse();
+  checkLineComplete(cls) { // TODO: формировать 1 раз, а не каждый вызов
+    let cellsArr = [];
+    let cellsArrIndexActive = -1;
+    [...document.getElementsByClassName('window__cell')].reverse().forEach((el, i) => {
+      if (i%10 == 0) {
+        cellsArrIndexActive++;
+        cellsArr[cellsArrIndexActive] = [];
+      }
+      cellsArr[cellsArrIndexActive].push(el)
+    });
+
+    console.log(cellsArr);
+
+    let lineToRemove = [];
+    cellsArr.forEach((line, index) => {
+      let flagLineFull = true;
+      for (let i = 0; i < line.length; i++) {
+        const el = line[i];
+        if (!el.classList.contains('set')) {
+          flagLineFull = false;
+          break;
+        }
+      }
+      if (flagLineFull) {
+        lineToRemove.push(index);
+      }
+    });
+
+    if (lineToRemove.length) {
+      lineToRemove.forEach(num => {
+        cellsArr[num].forEach(el => el.classList.remove('set'));
+      });
+    }
+
+    lineToRemove = lineToRemove.reverse();
+    for (let iRemove = 0; iRemove < lineToRemove.length; iRemove++) {
+      const indexLineRemove = lineToRemove[iRemove];
+      for (let iMoveDown = (indexLineRemove + 1); iMoveDown < cellsArr.length; iMoveDown++) {
+        const line = cellsArr[iMoveDown];
+        line.forEach(el => {
+          if (el.classList.contains('set')) {
+            el.classList.remove('set');
+            let pos = el.dataset.pos;
+            let posNew = String(Number(pos.slice(0, 2)) - 1).padStart(2, '0') + pos.slice(2);
+            document.querySelector(`[data-pos="${posNew}"]`).classList.add('set');
+          }
+        });
+      }
+      
+    }
+
     cls.createFigure();
   }
 
@@ -354,133 +428,9 @@ function startGame() {
   }
   document.getElementsByClassName('window__main')[0].appendChild(tetris);
 
-  let excel = document.getElementsByClassName('window__cell');
   let i = 0;
-  let previewItem = document.getElementsByClassName('item');
   let ip = 0;
-  function setCellAttribute (elemsArr, lengthY, lengthX, nameAttribute, index, y) {
-    if (!index) {
-      index = 0
-    }
-    y ? y-- : y = lengthY;
-    for (let x = 1; x <= lengthX; x++) {
-      try {
-        // elemsArr[index].setAttribute(nameAttribute + 'X', x);
-        // elemsArr[index].setAttribute(nameAttribute + 'Y', y);
-        elemsArr[index].dataset.pos = String(y).padStart(2, '0') + String(x).padStart(2, '0');
-        index++;
-      } catch (error) {
-        debugger
-      }
-    }
-    if (y > 1) {
-      setCellAttribute (elemsArr, lengthY, lengthX, nameAttribute, index, y);
-    }
-  }
 
-  setCellAttribute(excel, 18, 10, 'pos');
-  setCellAttribute(previewItem, 4, 4, 'pr');
-
-  let mainArr = [
-    // I - figure (0)
-    [
-      [0, 1],
-      [0, 2],
-      [0, 3],
-      // rotate 90
-      [[-1, 1], [0, 0], [1, -1], [2, -2]],
-      //rotate 180
-      [[1, -1], [0, 0], [-1, 1], [-2, 2]],
-      // rotate 270
-      [[-1, 1], [0, 0], [1, -1], [2, -2]],
-      //rotate 360
-      [[1, -1], [0, 0], [-1, 1], [-2, 2]],
-    ],
-    // square-figure (1)
-    [
-      [1, 0],
-      [0, 1],
-      [1, 1],
-      //rotate 90
-      [[0, 0], [0, 0], [0, 0], [0, 0],],
-      //rotate 180
-      [[0, 0], [0, 0], [0, 0], [0, 0],],
-      //rotate 270
-      [[0, 0], [0, 0], [0, 0], [0, 0],],
-      //rotate 360
-      [[0, 0], [0, 0], [0, 0], [0, 0],],
-    ],
-    // lego-figure (2)
-    [
-      [1, 0],
-      [2, 0],
-      [1, 1],
-      // rotate 90
-      [[0, 2], [-1, 1], [-2, 0], [0, 0],],
-      //rotate 180
-      [[2, 0], [1, 1], [0, 2], [0, 0],],
-      //rotate 270
-      [[0, -2], [1, -1], [2, 0], [0, 0],],
-      //rotate 360
-      [[-2, 0], [-1, -1], [0, -2], [0, 0],],
-    ],
-    // L-figure (3)
-    [
-      [1, 0],
-      [0, 1],
-      [0, 2],
-      // rotate 90
-      [[0, 1], [-1, 0], [1, 0], [2, -1],],
-      //rotate 180
-      [[1, 1], [0, 2], [0, 0], [-1, -1],],
-      //rotate 270
-      [[1, -2], [2, -1], [0, -1], [-1, 0],],
-      //rotate 360
-      [[-2, 0], [-1, -1], [-1, 1], [0, 2],],
-    ],
-    // mirr-L-figure (4)
-    [
-      [1, 0],
-      [1, 1],
-      [1, 2],
-      // rotate 90
-      [[0, 1], [-1, 0], [0, -1], [1, -2],],
-      // rotate 180
-      [[1, 1], [0, 2], [-1, 1], [-2, 0],],
-      // rotate 270
-      [[1, -2], [2, -1], [1, 0], [0, 1],],
-      // rotate 360
-      [[-2, 0], [-1, -1], [0, 0], [1, 1],],
-    ],
-    // z-figure (5)
-    [
-      [1, 0],
-      [-1, 1],
-      [0, 1],
-      // rotate 90
-      [[-1, 1], [-2, 0], [1, 1], [0, 0],],
-      // rotate 180
-      [[1, -1], [2, 0], [-1, -1], [0, 0],],
-      // rotate 270
-      [[-1, 1], [-2, 0], [1, 1], [0, 0],],
-      // rotate 360
-      [[1, -1], [2, 0], [-1, -1], [0, 0],],
-    ],
-    // s-figure (6)
-    [
-      [1, 0],
-      [1, 1],
-      [2, 1],
-      // rotete 90
-      [[1, 0], [0, 1], [-1, 0], [-2, 1],],
-      // rotete 180
-      [[-1, 0], [0, -1], [1, 0], [2, -1],],
-      // rotete 270
-      [[1, 0], [0, 1], [-1, 0], [-2, 1],],
-      // rotete 360
-      [[-1, 0], [0, -1], [1, 0], [2, -1],],
-    ]
-  ];
 
 let currentFigure = 0;
 let figureBody = 0;
