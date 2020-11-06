@@ -135,6 +135,9 @@ let gameState = {
   figureIndex: 0,
   getFigureCode: () => {
     return gameState.levelFigureCode[gameState.figureIndex];
+  },
+  getPreviewFigureCode: () => {
+    return gameState.levelFigureCode[gameState.figureIndex + 1];
   }
 }
 
@@ -148,12 +151,15 @@ class Figure {
   }
 
   createFigure() {
+    // сформировать элемент превью
+    this.parsePreview(gameState.getPreviewFigureCode());
+    // сформировать новый элемент
     this.figure = [];
     this.flagMoveDownStop = false;
+    this.code = gameState.getFigureCode();
     let startX = 5;
     let startY = 15;
     this.turnPosition = 2;
-    this.code = gameState.getFigureCode();
     let figureCellCoordinates = [
       String(startY).padStart(2, '0') + String(startX).padStart(2, '0'),
       String(startY + mainArr[this.code][0][1]).padStart(2, '0') + String(startX + mainArr[this.code][0][0]).padStart(2, '0'),
@@ -195,7 +201,8 @@ class Figure {
       } else {
         this.figure.forEach(elem => {elem.classList.add('set')});
         if (gameState.levelFigureCode.length > gameState.figureIndex) {
-          this.createFigure();
+          this.checkLineComplete(this);
+          // this.createFigure();
         } else {
           console.log('GAME OVER'); // TODO: всплывающее окно
         }
@@ -271,6 +278,21 @@ class Figure {
       figureNew = [];
     }
   }
+
+  checkLineComplete(cls) {
+    let cells = [...document.getElementsByClassName('window__cell')].reverse();
+    cls.createFigure();
+  }
+
+  parsePreview(code) {
+    const prevItems = [...document.getElementsByClassName('item')];
+    prevItems.forEach(el => el.classList.remove('green'));
+    let startPos = '0102';
+    document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + startPos + '"]').classList.add('green');
+    document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + String(1 + mainArr[code][0][1]).padStart(2, '0') + String(2 + mainArr[code][0][0]).padStart(2, '0') + '"]').classList.add('green');
+    document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + String(1 + mainArr[code][1][1]).padStart(2, '0') + String(2 + mainArr[code][1][0]).padStart(2, '0') + '"]').classList.add('green');
+    document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + String(1 + mainArr[code][2][1]).padStart(2, '0') + String(2 + mainArr[code][2][0]).padStart(2, '0') + '"]').classList.add('green');
+  }
 }
 
 let figureNew = new Figure();
@@ -284,6 +306,29 @@ window.addEventListener('keydown', function (e) {
   } 
   else if (e.keyCode == 38) {
     figureNew.rotate();
+  }
+  else if (e.keyCode == 40 && !figureNew.flagMoveDownStop) {
+    let newElemsArr = [];
+      for (let i = 0; i < figureNew.figure.length; i++) {
+        const cell = figureNew.figure[i];
+        cell.classList.remove('figure');
+        let posNew = String(Number(cell.dataset.pos.slice(0, 2)) - 1).padStart(2, '0') + cell.dataset.pos.slice(2);
+        let elemNew = document.querySelector('[data-pos="' + posNew + '"]');
+        newElemsArr.push(elemNew);
+
+        if (!elemNew || elemNew.classList.contains('set') || cell.dataset.pos.slice(0, 2) == '01') {
+          figureNew.flagMoveDownStop = true;
+        }
+      }
+
+      
+      if (!figureNew.flagMoveDownStop) {
+        newElemsArr.forEach(elem => {elem.classList.add('figure')});
+        figureNew.figure = [...newElemsArr];
+        newElemsArr = [];
+      } else {
+        figureNew.figure.forEach(elem => {elem.classList.add('set')});
+      }
   }
   else if (e.keyCode == 13 && !document.querySelector('.new-modal').classList.contains('hidden')) {
     document.getElementById('start-game').click();
@@ -320,8 +365,8 @@ function startGame() {
     y ? y-- : y = lengthY;
     for (let x = 1; x <= lengthX; x++) {
       try {
-        elemsArr[index].setAttribute(nameAttribute + 'X', x);
-        elemsArr[index].setAttribute(nameAttribute + 'Y', y);
+        // elemsArr[index].setAttribute(nameAttribute + 'X', x);
+        // elemsArr[index].setAttribute(nameAttribute + 'Y', y);
         elemsArr[index].dataset.pos = String(y).padStart(2, '0') + String(x).padStart(2, '0');
         index++;
       } catch (error) {
@@ -442,37 +487,37 @@ let figureBody = 0;
 let rotate = 1;
 let elNumber = 0;
 
-function create() {
-  let x = 5;
-  let y = 15;
-  let xp = 2;
-  let yp = 1;
+// function create() {
+//   let x = 5;
+//   let y = 15;
+//   let xp = 2;
+//   let yp = 1;
 
-  rotate = 1;
+//   rotate = 1;
 
-  currentFigure = newLevel[elNumber]; //currentFigure = getRandom();
-  currentFigurePreview = newLevel[elNumber + 1];
-  figureBody = [
-    document.querySelector(`[posX = "${x}"][posY = "${y}"]`),
-    document.querySelector(`[posX = "${x + mainArr[currentFigure][0][0]}"][posY = "${y + mainArr[currentFigure][0][1]}"]`),
-    document.querySelector(`[posX = "${x + mainArr[currentFigure][1][0]}"][posY = "${y + mainArr[currentFigure][1][1]}"]`),
-    document.querySelector(`[posX = "${x + mainArr[currentFigure][2][0]}"][posY = "${y + mainArr[currentFigure][2][1]}"]`)
-  ];
-  for (let i = 0; i < figureBody.length; i++) {
-    figureBody[i].classList.add('figure');
-  }
-  figurePreviewBody = [
-    document.querySelector(`[prx = "${xp}"][pry = "${yp}"]`),
-    document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][0][0]}"][pry = "${yp + mainArr[currentFigurePreview][0][1]}"]`),
-    document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][1][0]}"][pry = "${yp + mainArr[currentFigurePreview][1][1]}"]`),
-    document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][2][0]}"][pry = "${yp + mainArr[currentFigurePreview][2][1]}"]`)
-  ];
-  for (let ip = 0; ip < figurePreviewBody.length; ip++) {
-    figurePreviewBody[ip].classList.add('green');
-  }
-}
+//   currentFigure = newLevel[elNumber]; //currentFigure = getRandom();
+//   currentFigurePreview = newLevel[elNumber + 1];
+//   figureBody = [
+//     document.querySelector(`[posX = "${x}"][posY = "${y}"]`),
+//     document.querySelector(`[posX = "${x + mainArr[currentFigure][0][0]}"][posY = "${y + mainArr[currentFigure][0][1]}"]`),
+//     document.querySelector(`[posX = "${x + mainArr[currentFigure][1][0]}"][posY = "${y + mainArr[currentFigure][1][1]}"]`),
+//     document.querySelector(`[posX = "${x + mainArr[currentFigure][2][0]}"][posY = "${y + mainArr[currentFigure][2][1]}"]`)
+//   ];
+//   for (let i = 0; i < figureBody.length; i++) {
+//     figureBody[i].classList.add('figure');
+//   }
+//   figurePreviewBody = [
+//     document.querySelector(`[prx = "${xp}"][pry = "${yp}"]`),
+//     document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][0][0]}"][pry = "${yp + mainArr[currentFigurePreview][0][1]}"]`),
+//     document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][1][0]}"][pry = "${yp + mainArr[currentFigurePreview][1][1]}"]`),
+//     document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][2][0]}"][pry = "${yp + mainArr[currentFigurePreview][2][1]}"]`)
+//   ];
+//   for (let ip = 0; ip < figurePreviewBody.length; ip++) {
+//     figurePreviewBody[ip].classList.add('green');
+//   }
+// }
 
-create();
+// create();
 let inputField = document.getElementsByClassName('score')[0];
 inputField.value = `Ваши очки: ${score}`;
 
@@ -651,7 +696,7 @@ function move() {
 
 function getNewLevel() {
   let arr = [];
-  for (let iRandom = 0; iRandom < 30; iRandom++) {
+  for (let iRandom = 0; iRandom < 1000; iRandom++) {
     arr.push(Math.round(Math.random() * 6));
   }
   return arr;
