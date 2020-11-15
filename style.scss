@@ -66,6 +66,14 @@ body {
   align-items: start;
   justify-content: start;
   width: 200px;
+  &__stat {
+    background-color: #cccccc;
+    border: 3px solid;
+    border-top-color: #fffafa;
+    border-left-color: #e6e6e6;
+    border-right-color: #999;
+    border-bottom-color: #444;
+  }
 
   .table-preview {
     display: flex;

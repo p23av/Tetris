@@ -9,11 +9,11 @@ let totalSpeed = {
 };
 let level = 1;
 
-let inputFieldLevel = document.getElementsByClassName('level')[0];
-inputFieldLevel.value = `Текущий уровень: ${level}`;
+// let inputFieldLevel = document.getElementsByClassName('level')[0];
+// inputFieldLevel.value = `Текущий уровень: ${level}`;
 
-let inputFieldSpeed = document.getElementsByClassName('speed')[0];
-inputFieldSpeed.value = `Текущяя скорость: ${totalSpeed.speed}`;
+// let inputFieldSpeed = document.getElementsByClassName('speed')[0];
+// inputFieldSpeed.value = `Текущяя скорость: ${totalSpeed.speed}`;
 
 let mainArr = [
   // I - figure (0)
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setCellAttribute(excel, 18, 10, 'pos');
     setCellAttribute(previewItem, 4, 4, 'pr');
 
-    figureNew.createFigure();
+    figureStart.createFigure();
   });
 });
 
@@ -172,7 +172,12 @@ class Figure {
   flagMoveHorizontalStop = false;
   turnPosition = null;
   code = null;
-  constructor () {
+  speed = null;
+  levelPreviously = null;
+  score = 0;
+
+  constructor (level) {
+    this.level = level
   }
 
   createFigure() {
@@ -203,6 +208,9 @@ class Figure {
   }
 
   moveDown() {
+    let ratio = Math.ceil(this.level / 20) * 30;
+
+    let speed = 500 - ratio;
     let moveDownInterval = setInterval(() => {
       let newElemsArr = [];
       for (let i = 0; i < this.figure.length; i++) {
@@ -234,7 +242,7 @@ class Figure {
       }
       // elemNew.classList.add('figure');
       // this.figure[i] = elemNew;
-    }, 500);
+    }, speed);
   }
 
   moveHorizontal(direction) {
@@ -315,7 +323,7 @@ class Figure {
       cellsArr[cellsArrIndexActive].push(el)
     });
 
-    console.log(cellsArr);
+    // console.log(cellsArr);
 
     let lineToRemove = [];
     cellsArr.forEach((line, index) => {
@@ -355,6 +363,23 @@ class Figure {
       
     }
 
+    this.level += lineToRemove.length;
+
+    switch (lineToRemove.length) {
+      case 1:
+        this.score += 100
+        break;
+      case 2:
+        this.score += 250
+        break;
+      case 3:
+        this.score += 400
+        break;
+      case 4:
+        this.score += 550
+        break;
+    }
+
     cls.createFigure();
   }
 
@@ -366,42 +391,46 @@ class Figure {
     document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + String(1 + mainArr[code][0][1]).padStart(2, '0') + String(2 + mainArr[code][0][0]).padStart(2, '0') + '"]').classList.add('green');
     document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + String(1 + mainArr[code][1][1]).padStart(2, '0') + String(2 + mainArr[code][1][0]).padStart(2, '0') + '"]').classList.add('green');
     document.getElementsByClassName('table-preview')[0].querySelector('[data-pos="' + String(1 + mainArr[code][2][1]).padStart(2, '0') + String(2 + mainArr[code][2][0]).padStart(2, '0') + '"]').classList.add('green');
+
+    
+    document.getElementById('game-level').textContent = Math.ceil(this.level / 20);
+    document.getElementById('game-score').textContent = this.score;
   }
 }
 
-let figureNew = new Figure();
+let figureStart = new Figure(1);
 
 window.addEventListener('keydown', function (e) {
   if (e.keyCode == 37) {
-    figureNew.moveHorizontal('left');
+    figureStart.moveHorizontal('left');
   } 
   else if (e.keyCode == 39) {
-    figureNew.moveHorizontal('right');
+    figureStart.moveHorizontal('right');
   } 
   else if (e.keyCode == 38) {
-    figureNew.rotate();
+    figureStart.rotate();
   }
-  else if (e.keyCode == 40 && !figureNew.flagMoveDownStop) {
+  else if (e.keyCode == 40 && !figureStart.flagMoveDownStop) {
     let newElemsArr = [];
-      for (let i = 0; i < figureNew.figure.length; i++) {
-        const cell = figureNew.figure[i];
+      for (let i = 0; i < figureStart.figure.length; i++) {
+        const cell = figureStart.figure[i];
         cell.classList.remove('figure');
         let posNew = String(Number(cell.dataset.pos.slice(0, 2)) - 1).padStart(2, '0') + cell.dataset.pos.slice(2);
         let elemNew = document.querySelector('[data-pos="' + posNew + '"]');
         newElemsArr.push(elemNew);
 
         if (!elemNew || elemNew.classList.contains('set') || cell.dataset.pos.slice(0, 2) == '01') {
-          figureNew.flagMoveDownStop = true;
+          figureStart.flagMoveDownStop = true;
         }
       }
 
       
-      if (!figureNew.flagMoveDownStop) {
+      if (!figureStart.flagMoveDownStop) {
         newElemsArr.forEach(elem => {elem.classList.add('figure')});
-        figureNew.figure = [...newElemsArr];
+        figureStart.figure = [...newElemsArr];
         newElemsArr = [];
       } else {
-        figureNew.figure.forEach(elem => {elem.classList.add('set')});
+        figureStart.figure.forEach(elem => {elem.classList.add('set')});
       }
   }
   else if (e.keyCode == 13 && !document.querySelector('.new-modal').classList.contains('hidden')) {
@@ -437,39 +466,8 @@ let figureBody = 0;
 let rotate = 1;
 let elNumber = 0;
 
-// function create() {
-//   let x = 5;
-//   let y = 15;
-//   let xp = 2;
-//   let yp = 1;
-
-//   rotate = 1;
-
-//   currentFigure = newLevel[elNumber]; //currentFigure = getRandom();
-//   currentFigurePreview = newLevel[elNumber + 1];
-//   figureBody = [
-//     document.querySelector(`[posX = "${x}"][posY = "${y}"]`),
-//     document.querySelector(`[posX = "${x + mainArr[currentFigure][0][0]}"][posY = "${y + mainArr[currentFigure][0][1]}"]`),
-//     document.querySelector(`[posX = "${x + mainArr[currentFigure][1][0]}"][posY = "${y + mainArr[currentFigure][1][1]}"]`),
-//     document.querySelector(`[posX = "${x + mainArr[currentFigure][2][0]}"][posY = "${y + mainArr[currentFigure][2][1]}"]`)
-//   ];
-//   for (let i = 0; i < figureBody.length; i++) {
-//     figureBody[i].classList.add('figure');
-//   }
-//   figurePreviewBody = [
-//     document.querySelector(`[prx = "${xp}"][pry = "${yp}"]`),
-//     document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][0][0]}"][pry = "${yp + mainArr[currentFigurePreview][0][1]}"]`),
-//     document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][1][0]}"][pry = "${yp + mainArr[currentFigurePreview][1][1]}"]`),
-//     document.querySelector(`[prx = "${xp + mainArr[currentFigurePreview][2][0]}"][pry = "${yp + mainArr[currentFigurePreview][2][1]}"]`)
-//   ];
-//   for (let ip = 0; ip < figurePreviewBody.length; ip++) {
-//     figurePreviewBody[ip].classList.add('green');
-//   }
-// }
-
-// create();
 let inputField = document.getElementsByClassName('score')[0];
-inputField.value = `Ваши очки: ${score}`;
+// inputField.value = `Ваши очки: ${score}`;
 
 // движение фигуры вниз
 function move() {
@@ -573,75 +571,6 @@ function move() {
   }
 }
 
-// let interval = setInterval(() => {
-//   move();
-// }, totalSpeed.speed);
-
-// window.addEventListener('keydown', function (e) {
-//   let coordinates1 = [figureBody[0].getAttribute('posX'), figureBody[0].getAttribute('posY')];
-//   let coordinates2 = [figureBody[1].getAttribute('posX'), figureBody[1].getAttribute('posY')];
-//   let coordinates3 = [figureBody[2].getAttribute('posX'), figureBody[2].getAttribute('posY')];
-//   let coordinates4 = [figureBody[3].getAttribute('posX'), figureBody[3].getAttribute('posY')];
-
-//   function getNewState(a) {
-//     flag = true;
-//     let figureNew = [
-//       document.querySelector(`[posX = "${+coordinates1[0] + a}"][posY = "${coordinates1[1]}"]`),
-//       document.querySelector(`[posX = "${+coordinates2[0] + a}"][posY = "${coordinates2[1]}"]`),
-//       document.querySelector(`[posX = "${+coordinates3[0] + a}"][posY = "${coordinates3[1]}"]`),
-//       document.querySelector(`[posX = "${+coordinates4[0] + a}"][posY = "${coordinates4[1]}"]`),
-//     ];
-//     for (let i = 0; i < figureNew.length; i++) {
-//       if (!figureNew[i] || figureNew[i].classList.contains('set')) {
-//         flag = false;
-//       }
-//     }
-//     if (flag) {
-//       for (let i = 0; i < figureBody.length; i++) {
-//         figureBody[i].classList.remove('figure');
-//       }
-//       figureBody = figureNew;
-//       for (let i = 0; i < figureBody.length; i++) {
-//         figureBody[i].classList.add('figure');
-//       }
-//     }
-//   }
-
-//   if (e.keyCode == 37) {
-//     getNewState(-1);
-//   } else if (e.keyCode == 39) {
-//     getNewState(1);
-//   } else if (e.keyCode == 40) {
-//     move();
-//   } else if (e.keyCode == 38) {
-//     flag = true;
-//     let figureNew = [
-//       document.querySelector(`[posX = "${+coordinates1[0] + mainArr[currentFigure][rotate + 2][0][0]}"][posY = "${+coordinates1[1] + mainArr[currentFigure][rotate + 2][0][1]}"]`),
-//       document.querySelector(`[posX = "${+coordinates2[0] + mainArr[currentFigure][rotate + 2][1][0]}"][posY = "${+coordinates2[1] + mainArr[currentFigure][rotate + 2][1][1]}"]`),
-//       document.querySelector(`[posX = "${+coordinates3[0] + mainArr[currentFigure][rotate + 2][2][0]}"][posY = "${+coordinates3[1] + mainArr[currentFigure][rotate + 2][2][1]}"]`),
-//       document.querySelector(`[posX = "${+coordinates4[0] + mainArr[currentFigure][rotate + 2][3][0]}"][posY = "${+coordinates4[1] + mainArr[currentFigure][rotate + 2][3][1]}"]`),
-//     ];
-//     for (let i = 0; i < figureNew.length; i++) {
-//       if (!figureNew[i] || figureNew[i].classList.contains('set')) {
-//         flag = false;
-//       }
-//     }
-//     if (flag) {
-//       for (let i = 0; i < figureBody.length; i++) {
-//         figureBody[i].classList.remove('figure');
-//       }
-//       figureBody = figureNew;
-//       for (let i = 0; i < figureBody.length; i++) {
-//         figureBody[i].classList.add('figure');
-//       }
-//       if (rotate < 4) {
-//         rotate++;
-//       } else {
-//         rotate = 1;
-//       }
-//     }
-//   }
-// });
 }
 
 function getNewLevel() {
